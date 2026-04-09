@@ -158,11 +158,11 @@ const Dashboard: React.FC = () => {
                 <div className="bg-gradient-to-r from-tiktok-red/20 to-tiktok-cyan/20 border border-white/10 rounded-[2.5rem] p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
                   <div className="absolute top-0 left-0 w-full h-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
-                    <h2 className="text-2xl font-display uppercase italic mb-2">Unlock <span className="text-tiktok-red">Elite</span> Intelligence</h2>
-                    <p className="text-white/60 font-heading text-sm">Get advanced algorithm triggers, unlimited simulations, and private strategy sessions.</p>
+                    <h2 className="text-2xl font-display uppercase italic mb-2">Remove Your <span className="text-tiktok-red">Growth Ceiling</span></h2>
+                    <p className="text-white/60 font-heading text-sm">Stop guessing why your retention is dropping. Unlock advanced algorithm triggers and private strategy sessions.</p>
                   </div>
                   <Button className="relative z-10 bg-white text-black hover:bg-tiktok-cyan transition-all px-8 py-6 rounded-full font-display uppercase italic shadow-xl">
-                    Upgrade Now
+                    Upgrade to Elite
                   </Button>
                 </div>
 
@@ -207,9 +207,9 @@ const Dashboard: React.FC = () => {
                     <h2 className="text-2xl font-display uppercase italic mb-8">Growth Tools</h2>
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { label: "Hook Lab", icon: <Zap className="w-5 h-5" />, desc: "AI Hook Gen", premium: false },
-                        { label: "Niche Scout", icon: <BarChart3 className="w-5 h-5" />, desc: "Trend Analysis", premium: false },
-                        { label: "Revenue Calc", icon: <DollarSign className="w-5 h-5" />, desc: "ROI Forecast", premium: true },
+                        { label: "Hook Lab", icon: <Zap className="w-5 h-5" />, desc: "Fix Retention", premium: false },
+                        { label: "Niche Scout", icon: <BarChart3 className="w-5 h-5" />, desc: "Stop Stagnation", premium: false },
+                        { label: "Revenue Calc", icon: <DollarSign className="w-5 h-5" />, desc: "Monetize Reach", premium: true },
                         { label: "Strategy", icon: <BookOpen className="w-5 h-5" />, desc: "Viral Roadmap", premium: true },
                       ].map((tool, i) => (
                         <button key={i} className="bg-tiktok-black border border-white/5 p-6 rounded-2xl hover:border-tiktok-cyan text-left transition-all group relative overflow-hidden">
@@ -307,12 +307,12 @@ const Dashboard: React.FC = () => {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[
-                    { title: "Algorithm Secrets", category: "Strategy", duration: "45m", locked: false },
-                    { title: "Psychological Hooks", category: "Content", duration: "32m", locked: false },
-                    { title: "Monetization Mastery", category: "Revenue", duration: "58m", locked: true },
-                    { title: "Editing for Retention", category: "Technical", duration: "25m", locked: true },
-                    { title: "Niche Domination", category: "Strategy", duration: "40m", locked: true },
-                    { title: "Viral Analytics", category: "Data", duration: "35m", locked: true },
+                    { title: "Why You're Being Ignored", category: "Algorithm", duration: "45m", locked: false },
+                    { title: "The 0.5s Psychology", category: "Hooks", duration: "32m", locked: false },
+                    { title: "Escaping the 200 View Jail", category: "Growth", duration: "58m", locked: true },
+                    { title: "Retention Leak Audit", category: "Technical", duration: "25m", locked: true },
+                    { title: "High-Ceiling Niches", category: "Strategy", duration: "40m", locked: true },
+                    { title: "Monetization Secrets", category: "Revenue", duration: "35m", locked: true },
                   ].map((lesson, i) => (
                     <div key={i} className="bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden group hover:border-tiktok-cyan transition-all">
                       <div className="aspect-video bg-tiktok-black relative flex items-center justify-center overflow-hidden">

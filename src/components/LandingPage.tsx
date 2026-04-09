@@ -61,42 +61,42 @@ const stats = [
 
 const features = [
   {
-    title: "The Hook Strategy",
-    description: "Learn how to stop the scroll in the first 0.5 seconds with our proven psychological triggers.",
-    icon: <Zap className="w-6 h-6 text-tiktok-red" />,
+    title: "The Invisible Creator",
+    description: "You're posting consistently, but the algorithm treats you like a ghost. We reveal why your content is being ignored.",
+    icon: <EyeOff className="w-6 h-6 text-tiktok-red" />,
   },
   {
-    title: "Retention Mastery",
-    description: "Keep viewers watching until the end with advanced editing techniques and storytelling loops.",
-    icon: <Video className="w-6 h-6 text-tiktok-cyan" />,
+    title: "The Retention Leak",
+    description: "Your viewers are dropping off in the first 0.5 seconds. We identify the exact psychological triggers you're missing.",
+    icon: <Zap className="w-6 h-6 text-tiktok-cyan" />,
   },
   {
-    title: "Algorithm Hacking",
-    description: "Understand the math behind the FYP and how to trigger the viral explosion every time.",
-    icon: <TrendingUp className="w-6 h-6 text-tiktok-red" />,
+    title: "Algorithm Guessing",
+    description: "Stop throwing spaghetti at the wall. We replace 'hope' with a data-driven framework that forces FYP placement.",
+    icon: <Target className="w-6 h-6 text-tiktok-red" />,
   },
   {
-    title: "Niche Authority",
-    description: "Build a brand that people recognize and trust, turning viewers into loyal followers.",
-    icon: <Users className="w-6 h-6 text-tiktok-cyan" />,
+    title: "Niche Stagnation",
+    description: "Stuck in a niche that has no ceiling? We help you pivot to high-growth territories before you burn out.",
+    icon: <TrendingUp className="w-6 h-6 text-tiktok-cyan" />,
   },
 ];
 
 const curriculum = [
   {
     id: "item-1",
-    title: "Module 1: The Foundation",
-    content: "Setting up your profile for maximum conversion, understanding your target audience, and finding your unique voice.",
+    title: "Module 1: The Growth Breakdown",
+    content: "Identifying exactly where your content is leaking views and why your current profile is working against the algorithm.",
   },
   {
     id: "item-2",
-    title: "Module 2: Content Creation Workflow",
-    content: "Our rapid-fire scripting method, high-quality filming with just a phone, and the 'Viral Edit' checklist.",
+    title: "Module 2: Psychological Hook Lab",
+    content: "Moving beyond generic advice to master the deep psychological triggers that stop the scroll instantly.",
   },
   {
     id: "item-3",
-    title: "Module 3: Growth & Monetization",
-    content: "Leveraging trends without being a 'trend-chaser', brand deals, and selling your own products.",
+    title: "Module 3: Strategic Momentum",
+    content: "How to turn a single viral moment into a sustainable brand without becoming a slave to the next trend.",
   },
 ];
 
@@ -129,26 +129,26 @@ const testimonials = [
 
 const processSteps = [
   {
-    title: "Identify",
-    description: "Find your winning niche using our data-driven research tools.",
+    title: "Clarity",
+    description: "Stop guessing. We identify the growth blind spots that are keeping you invisible.",
     icon: <Search className="w-8 h-8 text-tiktok-cyan" />,
     step: "01"
   },
   {
-    title: "Produce",
-    description: "Create high-retention videos with our plug-and-play scripts.",
-    icon: <Video className="w-8 h-8 text-tiktok-red" />,
+    title: "Precision",
+    description: "Replace generic content with high-retention scripts designed for the human brain.",
+    icon: <Target className="w-8 h-8 text-tiktok-red" />,
     step: "02"
   },
   {
-    title: "Hack",
-    description: "Deploy the ViralFlow algorithm triggers to force FYP placement.",
+    title: "Momentum",
+    description: "Trigger the algorithm's viral loop using our proven psychological framework.",
     icon: <Zap className="w-8 h-8 text-tiktok-cyan" />,
     step: "03"
   },
   {
-    title: "Monetize",
-    description: "Turn your viral views into a sustainable six-figure business.",
+    title: "Freedom",
+    description: "Turn your momentum into a sustainable business that doesn't require 24/7 effort.",
     icon: <Rocket className="w-8 h-8 text-tiktok-red" />,
     step: "04"
   },
@@ -392,11 +392,11 @@ export default function LandingPage() {
                 The #1 Short-Form Academy
               </Badge>
               <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-display leading-[0.85] uppercase italic tracking-tighter mb-8">
-                Stop <span className="text-tiktok-red">Posting</span><br />
-                Start <span className="text-tiktok-cyan">Winning</span>
+                You're Not <span className="text-tiktok-red">Lazy</span><br />
+                You're Just <span className="text-tiktok-cyan">Guessing</span>
               </h1>
               <p className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto mb-12 font-heading">
-                Master the psychological triggers that force the algorithm to push your content to millions. No dancing required.
+                Posting more is not the same as growing smarter. Stop wasting effort on content that was never designed to go viral.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Button 
@@ -436,6 +436,58 @@ export default function LandingPage() {
               >
                 <div className="text-4xl md:text-5xl font-display italic text-tiktok-cyan mb-2">{stat.value}</div>
                 <div className="text-xs uppercase tracking-[0.2em] text-white/40 font-bold">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pain Points Section */}
+      <section className="py-24 border-b border-white/10 bg-tiktok-black">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl md:text-7xl font-display uppercase italic leading-none mb-6">
+              Stop Being <span className="text-tiktok-red">Ignored</span>
+            </h2>
+            <p className="text-white/40 uppercase tracking-widest text-sm font-bold">The hidden cost of staying stuck is your time.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                title: "Low Reach",
+                desc: "You're putting in 100% effort for 200 views. It's not the algorithm—it's your signals.",
+                icon: <TrendingUp className="w-6 h-6 rotate-180 text-tiktok-red" />
+              },
+              {
+                title: "Hook Failure",
+                desc: "If they don't stop in 0.5s, your video is already dead. Most creators fail here.",
+                icon: <Zap className="w-6 h-6 text-tiktok-cyan" />
+              },
+              {
+                title: "Niche Trap",
+                desc: "Some niches are designed to fail. We help you find the territories that actually scale.",
+                icon: <Target className="w-6 h-6 text-tiktok-red" />
+              },
+              {
+                title: "Burnout",
+                desc: "The 'post every day' advice is a lie if you don't have a framework that works.",
+                icon: <Flame className="w-6 h-6 text-tiktok-cyan" />
+              }
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/5 border border-white/10 p-8 rounded-[2rem] hover:border-tiktok-red/50 transition-all group"
+              >
+                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-display uppercase italic mb-4">{item.title}</h3>
+                <p className="text-white/40 text-sm font-heading leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -492,11 +544,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16">
-              <Badge className="bg-tiktok-red text-white mb-4 px-4 py-1 rounded-full text-xs uppercase tracking-widest border-none">Interactive Experience</Badge>
+              <Badge className="bg-tiktok-red text-white mb-4 px-4 py-1 rounded-full text-xs uppercase tracking-widest border-none">Private Breakdown</Badge>
               <h2 className="text-4xl md:text-6xl font-display uppercase italic mb-6">
-                Test the <span className="text-tiktok-cyan">ViralFlow</span> Engine
+                Expose Your <span className="text-tiktok-cyan">Growth Leaks</span>
               </h2>
-              <p className="text-white/60 text-lg font-heading">Experience the exact steps our students use to dominate the algorithm.</p>
+              <p className="text-white/60 text-lg font-heading">Experience the first layer of clarity. See why your current niche might be holding you back.</p>
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-sm relative overflow-hidden">
@@ -785,6 +837,97 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Dashboard Intelligence Preview */}
+      <section className="py-24 bg-tiktok-black border-b border-white/10">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="lg:w-1/2">
+              <Badge className="bg-tiktok-cyan text-black mb-4 px-4 py-1 rounded-full text-xs uppercase tracking-widest border-none">Intelligence Lab</Badge>
+              <h2 className="text-5xl md:text-7xl font-display uppercase italic leading-none mb-8">
+                Your Growth <span className="text-tiktok-cyan">Blind Spots</span>
+              </h2>
+              <p className="text-xl text-white/60 mb-8 font-heading">
+                Most creators are losing 80% of their potential reach in the first 3 seconds. Our dashboard exposes exactly where your retention leaks are happening.
+              </p>
+              <ul className="space-y-4 mb-12">
+                {[
+                  "Real-time retention leak detection",
+                  "Niche saturation intelligence",
+                  "Psychological hook performance tracking",
+                  "Algorithm trigger verification"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-white/80 font-heading">
+                    <CheckCircle2 className="w-5 h-5 text-tiktok-cyan" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button 
+                onClick={handleJoinClick}
+                className="bg-white text-black hover:bg-tiktok-red hover:text-white transition-all rounded-none font-display italic text-xl px-10 py-6"
+              >
+                Unlock Your Breakdown
+              </Button>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 relative overflow-hidden shadow-2xl">
+                {/* Mock Dashboard UI */}
+                <div className="space-y-6 blur-[4px] select-none pointer-events-none opacity-40">
+                  <div className="flex justify-between items-center">
+                    <div className="h-8 w-32 bg-white/10 rounded-lg" />
+                    <div className="h-8 w-24 bg-tiktok-red/20 rounded-lg" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="h-24 bg-white/5 rounded-2xl" />
+                    <div className="h-24 bg-white/5 rounded-2xl" />
+                    <div className="h-24 bg-white/5 rounded-2xl" />
+                  </div>
+                  <div className="h-48 bg-white/5 rounded-2xl" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-white/10 rounded" />
+                    <div className="h-4 w-3/4 bg-white/10 rounded" />
+                  </div>
+                </div>
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-tiktok-black/20 backdrop-blur-[2px]">
+                  <div className="w-16 h-16 bg-tiktok-red rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(254,44,85,0.4)]">
+                    <Lock className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-display uppercase italic mb-4">Intelligence Locked</h3>
+                  <p className="text-white/60 text-sm font-heading mb-8 max-w-xs">
+                    Sign up to reveal your personalized growth breakdown and identify your content blind spots.
+                  </p>
+                  <Button 
+                    onClick={handleJoinClick}
+                    variant="outline" 
+                    className="border-tiktok-red text-tiktok-red hover:bg-tiktok-red hover:text-white rounded-full font-display uppercase italic px-8"
+                  >
+                    Reveal My Data
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Floating Badges */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -top-6 -right-6 bg-tiktok-cyan text-black p-4 rounded-2xl font-display italic text-sm shadow-xl z-20"
+              >
+                94% Accuracy
+              </motion.div>
+              <motion.div 
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                className="absolute -bottom-6 -left-6 bg-tiktok-red text-white p-4 rounded-2xl font-display italic text-sm shadow-xl z-20"
+              >
+                Algorithm Verified
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-24 lg:py-32">
         <div className="container mx-auto px-6">
@@ -1062,29 +1205,33 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 lg:py-48 relative">
-        <div className="absolute inset-0 bg-tiktok-red/10" />
+      <section className="py-24 lg:py-48 relative overflow-hidden">
+        <div className="absolute inset-0 bg-tiktok-red/5" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(254,44,85,0.1)_0%,transparent_70%)] pointer-events-none" />
+        
         <div className="container mx-auto px-6 relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            className="max-w-4xl mx-auto"
           >
-            <h2 className="text-6xl md:text-9xl font-display uppercase italic tracking-tighter mb-12">
-              Ready to go <span className="text-tiktok-cyan">Viral?</span>
+            <h2 className="text-6xl md:text-9xl font-display uppercase italic tracking-tighter mb-12 leading-[0.85]">
+              Stop Posting Into <span className="text-tiktok-red">The Void</span>
             </h2>
             <p className="text-2xl text-white/60 mb-12 max-w-2xl mx-auto font-heading">
-              Join 12,000+ creators who have cracked the code. The next viral video could be yours.
+              The algorithm isn't broken. Your strategy is. Join 12,000+ creators who finally stopped guessing and started growing.
             </p>
             <Button 
               size="lg" 
               onClick={handleJoinClick}
-              className="bg-white text-black hover:bg-tiktok-cyan transition-all rounded-none font-display italic text-3xl px-16 py-10"
+              className="bg-tiktok-red text-white hover:bg-white hover:text-black transition-all rounded-none font-display italic text-3xl px-16 py-10 group"
             >
               {user ? "Access Dashboard" : "Claim Your Spot"}
+              <ArrowRight className="ml-4 w-8 h-8 group-hover:translate-x-2 transition-transform" />
             </Button>
-            <p className="mt-8 text-white/40 text-sm uppercase tracking-widest font-bold">
-              Limited spots available for the April cohort
+            <p className="mt-8 text-white/20 uppercase tracking-[0.2em] text-xs font-bold">
+              The first step to clarity is one click away.
             </p>
           </motion.div>
         </div>
