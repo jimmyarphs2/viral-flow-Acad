@@ -11,8 +11,16 @@ if (!firebaseConfig || !firebaseConfig.apiKey) {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = (firebaseConfig as any).firestoreDatabaseId 
-  ? getFirestore(app, (firebaseConfig as any).firestoreDatabaseId)
+
+const databaseId = (firebaseConfig as any).firestoreDatabaseId;
+if (databaseId) {
+  console.log(`Connecting to Firestore database: ${databaseId}`);
+} else {
+  console.log("Connecting to default Firestore database");
+}
+
+export const db = databaseId 
+  ? getFirestore(app, databaseId)
   : getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
