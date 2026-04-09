@@ -48,5 +48,13 @@
       "schema": "Simulation",
       "description": "User-specific viral simulations"
     }
+  },
+  "notes": {
+    "authorizedDomains": [
+      "localhost",
+      "gen-lang-client-0129067590.firebaseapp.com",
+      "gen-lang-client-0129067590.web.app",
+      "viralflaw.jobrilanation.com"
+    ]
   }
 }
