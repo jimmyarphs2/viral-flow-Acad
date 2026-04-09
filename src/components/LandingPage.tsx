@@ -18,7 +18,9 @@ import {
   Flame,
   Rocket,
   Target,
-  ChevronUp
+  ChevronUp,
+  BarChart3,
+  DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -138,6 +140,8 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [demoStep, setDemoStep] = useState(0);
+  const [selectedNiche, setSelectedNiche] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -303,6 +307,181 @@ export default function LandingPage() {
                 )}
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Demo Section */}
+      <section className="py-24 bg-tiktok-black relative overflow-hidden border-b border-white/10">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(254,44,85,0.05)_0%,transparent_70%)] pointer-events-none" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <Badge className="bg-tiktok-red text-white mb-4 px-4 py-1 rounded-full text-xs uppercase tracking-widest border-none">Interactive Experience</Badge>
+              <h2 className="text-4xl md:text-6xl font-display uppercase italic mb-6">
+                Test the <span className="text-tiktok-cyan">ViralFlow</span> Engine
+              </h2>
+              <p className="text-white/60 text-lg font-heading">Experience the exact steps our students use to dominate the algorithm.</p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <BarChart3 className="w-32 h-32 text-tiktok-cyan" />
+              </div>
+
+              {/* Progress Bar */}
+              <div className="flex justify-between mb-12 relative">
+                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/10 -translate-y-1/2 z-0" />
+                <motion.div 
+                  className="absolute top-1/2 left-0 h-[2px] bg-tiktok-red -translate-y-1/2 z-0"
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${(demoStep / 3) * 100}%` }}
+                />
+                {[0, 1, 2, 3].map((step) => (
+                  <div key={step} className="relative z-10">
+                    <motion.div 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                        demoStep >= step ? "bg-tiktok-red border-tiktok-red text-white" : "bg-tiktok-black border-white/10 text-white/40"
+                      }`}
+                      animate={{ scale: demoStep === step ? 1.2 : 1 }}
+                    >
+                      {demoStep > step ? <CheckCircle2 className="w-5 h-5" /> : step + 1}
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
+
+              <AnimatePresence mode="wait">
+                {demoStep === 0 && (
+                  <motion.div
+                    key="step0"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="text-center"
+                  >
+                    <h3 className="text-3xl font-display uppercase italic mb-8">Step 1: Identify Your Winning Niche</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {["Tech", "Fitness", "Finance", "Lifestyle"].map((niche) => (
+                        <button
+                          key={niche}
+                          onClick={() => {
+                            setSelectedNiche(niche);
+                            setDemoStep(1);
+                          }}
+                          className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-tiktok-cyan hover:bg-tiktok-cyan/5 transition-all group"
+                        >
+                          <div className="text-xl font-display uppercase italic group-hover:text-tiktok-cyan">{niche}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {demoStep === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="text-center"
+                  >
+                    <h3 className="text-3xl font-display uppercase italic mb-4">Step 2: Generate High-Retention Hook</h3>
+                    <p className="text-white/60 mb-8">Crafting a hook for the <span className="text-tiktok-cyan font-bold">{selectedNiche}</span> niche...</p>
+                    <div className="bg-tiktok-black p-8 rounded-2xl border border-white/10 mb-8 relative overflow-hidden">
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="text-2xl font-heading italic text-white"
+                      >
+                        "POV: You found the secret to <span className="text-tiktok-red">{selectedNiche}</span> growth that nobody is talking about..."
+                      </motion.div>
+                      <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-red" />
+                    </div>
+                    <Button 
+                      onClick={() => setDemoStep(2)}
+                      className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-8 py-6 rounded-full text-lg font-display uppercase italic"
+                    >
+                      Apply Algorithm Triggers <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </motion.div>
+                )}
+
+                {demoStep === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="text-center"
+                  >
+                    <h3 className="text-3xl font-display uppercase italic mb-8">Step 3: Hack the Algorithm</h3>
+                    <div className="flex justify-center items-center gap-12 mb-12">
+                      <div className="text-center">
+                        <div className="text-5xl font-display italic text-tiktok-cyan mb-2">
+                          <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                          >
+                            1.2M
+                          </motion.span>
+                        </div>
+                        <div className="text-xs uppercase tracking-widest text-white/40">Projected Views</div>
+                      </div>
+                      <div className="w-[2px] h-16 bg-white/10" />
+                      <div className="text-center">
+                        <div className="text-5xl font-display italic text-tiktok-red mb-2">98%</div>
+                        <div className="text-xs uppercase tracking-widest text-white/40">Retention Rate</div>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => setDemoStep(3)}
+                      className="bg-tiktok-cyan hover:bg-tiktok-cyan/90 text-tiktok-black px-8 py-6 rounded-full text-lg font-display uppercase italic"
+                    >
+                      Calculate Revenue <Rocket className="ml-2 w-5 h-5" />
+                    </Button>
+                  </motion.div>
+                )}
+
+                {demoStep === 3 && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center"
+                  >
+                    <div className="w-20 h-20 bg-tiktok-red/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Rocket className="w-10 h-10 text-tiktok-red" />
+                    </div>
+                    <h3 className="text-4xl font-display uppercase italic mb-4">Viral Success Achieved!</h3>
+                    <p className="text-xl text-white/60 mb-8 font-heading">
+                      With your <span className="text-tiktok-cyan font-bold">{selectedNiche}</span> content, you could be generating:
+                    </p>
+                    <div className="text-7xl md:text-8xl font-display italic text-white mb-12 flex items-center justify-center">
+                      <DollarSign className="w-12 h-12 md:w-16 md:h-16 text-tiktok-red" />
+                      12,450<span className="text-tiktok-red text-4xl md:text-5xl">/mo</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-10 py-8 rounded-full text-xl font-display uppercase italic shadow-[0_0_30px_rgba(254,44,85,0.3)]">
+                        Start Your Journey Now
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => {
+                          setDemoStep(0);
+                          setSelectedNiche("");
+                        }}
+                        className="text-white/60 hover:text-white hover:bg-white/5 px-10 py-8 rounded-full text-xl font-display uppercase italic"
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </section>
