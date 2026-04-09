@@ -20,7 +20,10 @@ import {
   Target,
   ChevronUp,
   BarChart3,
-  DollarSign
+  DollarSign,
+  Loader2,
+  Sparkles,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,6 +35,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import {
+  analyzeNiche,
+  generateHooks,
+  simulatePerformance,
+  type NicheIntelligence,
+  type HookGeneration,
+  type ViralSimulation
+} from "@/services/viralFlowAI";
 
 const stats = [
   { label: "Active Students", value: "12,400+" },
@@ -166,6 +177,74 @@ export default function LandingPage() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
   const [selectedNiche, setSelectedNiche] = useState("");
+  const [customNiche, setCustomNiche] = useState("");
+  const [completedModules, setCompletedModules] = useState<string[]>([]);
+  
+  // AI States
+  const [nicheAI, setNicheAI] = useState<NicheIntelligence | null>(null);
+  const [hookAI, setHookAI] = useState<HookGeneration | null>(null);
+  const [simulationAI, setSimulationAI] = useState<ViralSimulation | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedHook, setSelectedHook] = useState("");
+
+  const handleNicheSubmit = async (niche: string) => {
+    setIsLoading(true);
+    try {
+      const result = await analyzeNiche(niche);
+      setNicheAI(result);
+      setSelectedNiche(result.refinedNiche);
+      setDemoStep(1);
+    } catch (error) {
+      console.error("Niche analysis failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleHookGeneration = async () => {
+    if (!nicheAI) return;
+    setIsLoading(true);
+    try {
+      const result = await generateHooks(nicheAI.refinedNiche, nicheAI.viralPotentialScore);
+      setHookAI(result);
+      setDemoStep(2);
+    } catch (error) {
+      console.error("Hook generation failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSimulation = async (hook: string) => {
+    setSelectedHook(hook);
+    setIsLoading(true);
+    try {
+      const result = await simulatePerformance(selectedNiche, hook);
+      setSimulationAI(result);
+      setDemoStep(3);
+    } catch (error) {
+      console.error("Simulation failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem("viralflow_progress");
+    if (saved) {
+      setCompletedModules(JSON.parse(saved));
+    }
+  }, []);
+
+  const toggleModule = (id: string) => {
+    const updated = completedModules.includes(id)
+      ? completedModules.filter(m => m !== id)
+      : [...completedModules, id];
+    setCompletedModules(updated);
+    localStorage.setItem("viralflow_progress", JSON.stringify(updated));
+  };
+
+  const progressPercentage = Math.round((completedModules.length / curriculum.length) * 100);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -386,15 +465,34 @@ export default function LandingPage() {
                     className="text-center"
                   >
                     <h3 className="text-3xl font-display uppercase italic mb-8">Step 1: Identify Your Winning Niche</h3>
+                    
+                    <div className="mb-8">
+                      <div className="relative max-w-md mx-auto">
+                        <input 
+                          type="text"
+                          placeholder="Enter your niche (e.g., AI Tools, Fitness for Busy Moms)"
+                          value={customNiche}
+                          onChange={(e) => setCustomNiche(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-full py-4 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-tiktok-cyan transition-colors font-heading"
+                        />
+                        <Button 
+                          disabled={!customNiche || isLoading}
+                          onClick={() => handleNicheSubmit(customNiche)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-tiktok-cyan text-black hover:bg-tiktok-cyan/90 rounded-full h-10 px-4"
+                        >
+                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="text-white/40 text-xs uppercase tracking-widest mb-4 font-bold">Or select a popular one</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {["Tech", "Fitness", "Finance", "Lifestyle"].map((niche) => (
                         <button
                           key={niche}
-                          onClick={() => {
-                            setSelectedNiche(niche);
-                            setDemoStep(1);
-                          }}
-                          className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-tiktok-cyan hover:bg-tiktok-cyan/5 transition-all group"
+                          disabled={isLoading}
+                          onClick={() => handleNicheSubmit(niche)}
+                          className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-tiktok-cyan hover:bg-tiktok-cyan/5 transition-all group disabled:opacity-50"
                         >
                           <div className="text-xl font-display uppercase italic group-hover:text-tiktok-cyan">{niche}</div>
                         </button>
@@ -403,7 +501,7 @@ export default function LandingPage() {
                   </motion.div>
                 )}
 
-                {demoStep === 1 && (
+                {demoStep === 1 && nicheAI && (
                   <motion.div
                     key="step1"
                     initial={{ opacity: 0, x: 20 }}
@@ -411,29 +509,48 @@ export default function LandingPage() {
                     exit={{ opacity: 0, x: -20 }}
                     className="text-center"
                   >
-                    <h3 className="text-3xl font-display uppercase italic mb-4">Step 2: Generate High-Retention Hook</h3>
-                    <p className="text-white/60 mb-8">Crafting a hook for the <span className="text-tiktok-cyan font-bold">{selectedNiche}</span> niche...</p>
-                    <div className="bg-tiktok-black p-8 rounded-2xl border border-white/10 mb-8 relative overflow-hidden">
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        className="text-2xl font-heading italic text-white"
-                      >
-                        "POV: You found the secret to <span className="text-tiktok-red">{selectedNiche}</span> growth that nobody is talking about..."
-                      </motion.div>
-                      <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-red" />
+                    <h3 className="text-3xl font-display uppercase italic mb-4">Step 2: Niche Intelligence</h3>
+                    <div className="grid md:grid-cols-2 gap-8 mb-8 text-left">
+                      <div className="bg-tiktok-black p-6 rounded-2xl border border-white/10">
+                        <div className="text-xs uppercase tracking-widest text-white/40 mb-2 font-bold">Refined Niche</div>
+                        <div className="text-xl font-display italic text-tiktok-cyan mb-4">{nicheAI.refinedNiche}</div>
+                        <div className="text-xs uppercase tracking-widest text-white/40 mb-2 font-bold">Viral Potential</div>
+                        <div className={`text-lg font-bold mb-4 ${
+                          nicheAI.viralPotentialScore === 'High' ? 'text-tiktok-red' : 
+                          nicheAI.viralPotentialScore === 'Medium' ? 'text-tiktok-cyan' : 'text-white/60'
+                        }`}>
+                          {nicheAI.viralPotentialScore} Potential
+                        </div>
+                      </div>
+                      <div className="bg-tiktok-black p-6 rounded-2xl border border-white/10">
+                        <div className="text-xs uppercase tracking-widest text-white/40 mb-2 font-bold">AI Insight</div>
+                        <p className="text-white/60 font-heading text-sm leading-relaxed">{nicheAI.insight}</p>
+                      </div>
                     </div>
+
+                    <div className="mb-8">
+                      <div className="text-xs uppercase tracking-widest text-white/40 mb-4 font-bold">Upgraded Variations</div>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {nicheAI.alternativeNiches.map((alt, i) => (
+                          <Badge key={i} variant="outline" className="border-white/10 text-white/60 px-4 py-2 rounded-full">
+                            {alt}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
                     <Button 
-                      onClick={() => setDemoStep(2)}
+                      onClick={handleHookGeneration}
+                      disabled={isLoading}
                       className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-8 py-6 rounded-full text-lg font-display uppercase italic"
                     >
-                      Apply Algorithm Triggers <ArrowRight className="ml-2 w-5 h-5" />
+                      {isLoading ? <Loader2 className="mr-2 w-5 h-5 animate-spin" /> : <Zap className="mr-2 w-5 h-5" />}
+                      Generate Viral Hooks
                     </Button>
                   </motion.div>
                 )}
 
-                {demoStep === 2 && (
+                {demoStep === 2 && hookAI && (
                   <motion.div
                     key="step2"
                     initial={{ opacity: 0, x: 20 }}
@@ -441,65 +558,120 @@ export default function LandingPage() {
                     exit={{ opacity: 0, x: -20 }}
                     className="text-center"
                   >
-                    <h3 className="text-3xl font-display uppercase italic mb-8">Step 3: Hack the Algorithm</h3>
-                    <div className="flex justify-center items-center gap-12 mb-12">
-                      <div className="text-center">
-                        <div className="text-5xl font-display italic text-tiktok-cyan mb-2">
-                          <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            1.2M
-                          </motion.span>
+                    <h3 className="text-3xl font-display uppercase italic mb-4">Step 3: Viral Hook Generation</h3>
+                    
+                    {hookAI.pivotSuggestion && (
+                      <div className="bg-tiktok-red/10 border border-tiktok-red/20 p-4 rounded-xl mb-6 flex items-start gap-3 text-left">
+                        <AlertCircle className="w-5 h-5 text-tiktok-red shrink-0 mt-1" />
+                        <div>
+                          <div className="text-tiktok-red font-bold text-sm uppercase tracking-widest mb-1">Pivot Suggestion</div>
+                          <p className="text-white/80 text-sm font-heading"><span className="font-bold">{hookAI.pivotSuggestion}</span>: {hookAI.pivotReason}</p>
                         </div>
-                        <div className="text-xs uppercase tracking-widest text-white/40">Projected Views</div>
                       </div>
-                      <div className="w-[2px] h-16 bg-white/10" />
-                      <div className="text-center">
-                        <div className="text-5xl font-display italic text-tiktok-red mb-2">98%</div>
-                        <div className="text-xs uppercase tracking-widest text-white/40">Retention Rate</div>
-                      </div>
+                    )}
+
+                    <div className="space-y-4 mb-8">
+                      {hookAI.hooks.map((hook, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleSimulation(hook)}
+                          disabled={isLoading}
+                          className="w-full p-6 bg-tiktok-black border border-white/10 rounded-2xl hover:border-tiktok-cyan text-left group transition-all relative overflow-hidden"
+                        >
+                          <div className="text-lg font-heading italic text-white/80 group-hover:text-white">"{hook}"</div>
+                          <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      ))}
+
+                      {hookAI.powerHook && (
+                        <button
+                          onClick={() => handleSimulation(hookAI.powerHook!)}
+                          disabled={isLoading}
+                          className="w-full p-6 bg-tiktok-red/5 border border-tiktok-red/20 rounded-2xl hover:border-tiktok-red text-left group transition-all relative overflow-hidden"
+                        >
+                          <div className="text-xs uppercase tracking-widest text-tiktok-red font-bold mb-2 flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" /> Power Hook
+                          </div>
+                          <div className="text-xl font-heading italic text-white group-hover:text-tiktok-red">"{hookAI.powerHook}"</div>
+                          <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-red" />
+                        </button>
+                      )}
                     </div>
-                    <Button 
-                      onClick={() => setDemoStep(3)}
-                      className="bg-tiktok-cyan hover:bg-tiktok-cyan/90 text-tiktok-black px-8 py-6 rounded-full text-lg font-display uppercase italic"
-                    >
-                      Calculate Revenue <Rocket className="ml-2 w-5 h-5" />
-                    </Button>
+
+                    {hookAI.postingStrategy && (
+                      <div className="text-white/40 text-sm font-heading italic mb-4">
+                        Strategy: {hookAI.postingStrategy}
+                      </div>
+                    )}
+
+                    {isLoading && (
+                      <div className="flex items-center justify-center gap-2 text-tiktok-cyan font-display italic">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Simulating Viral Performance...
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
-                {demoStep === 3 && (
+                {demoStep === 3 && simulationAI && (
                   <motion.div
                     key="step3"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center"
                   >
-                    <div className="w-20 h-20 bg-tiktok-red/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Rocket className="w-10 h-10 text-tiktok-red" />
+                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                      simulationAI.outcome === 'Viral Success Achievable' ? 'bg-tiktok-cyan/20' : 'bg-tiktok-red/20'
+                    }`}>
+                      {simulationAI.outcome === 'Viral Success Achievable' ? 
+                        <Rocket className="w-10 h-10 text-tiktok-cyan" /> : 
+                        <AlertCircle className="w-10 h-10 text-tiktok-red" />
+                      }
                     </div>
-                    <h3 className="text-4xl font-display uppercase italic mb-4">Viral Success Achieved!</h3>
-                    <p className="text-xl text-white/60 mb-8 font-heading">
-                      With your <span className="text-tiktok-cyan font-bold">{selectedNiche}</span> content, you could be generating:
-                    </p>
-                    <div className="text-7xl md:text-8xl font-display italic text-white mb-12 flex items-center justify-center">
-                      <DollarSign className="w-12 h-12 md:w-16 md:h-16 text-tiktok-red" />
-                      12,450<span className="text-tiktok-red text-4xl md:text-5xl">/mo</span>
+                    
+                    <h3 className={`text-4xl font-display uppercase italic mb-2 ${
+                      simulationAI.outcome === 'Viral Success Achievable' ? 'text-tiktok-cyan' : 'text-tiktok-red'
+                    }`}>
+                      {simulationAI.outcome}
+                    </h3>
+                    <p className="text-white/40 text-sm uppercase tracking-widest font-bold mb-8">{simulationAI.cta}</p>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-2xl font-display italic text-white mb-1">{simulationAI.viewsRange}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40">Views</div>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-2xl font-display italic text-white mb-1">{simulationAI.retentionRange}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40">Retention</div>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-2xl font-display italic text-white mb-1">{simulationAI.engagement}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40">Engagement</div>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-2xl font-display italic text-tiktok-cyan mb-1">{simulationAI.revenueMonthlyRange}</div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40">Monthly Est.</div>
+                      </div>
                     </div>
+
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-10 py-8 rounded-full text-xl font-display uppercase italic shadow-[0_0_30px_rgba(254,44,85,0.3)]">
-                        Start Your Journey Now
+                        Join & Scale Now
                       </Button>
                       <Button 
                         variant="ghost" 
                         onClick={() => {
                           setDemoStep(0);
                           setSelectedNiche("");
+                          setCustomNiche("");
+                          setNicheAI(null);
+                          setHookAI(null);
+                          setSimulationAI(null);
                         }}
                         className="text-white/60 hover:text-white hover:bg-white/5 px-10 py-8 rounded-full text-xl font-display uppercase italic"
                       >
-                        Try Again
+                        Try New Niche
                       </Button>
                     </div>
                   </motion.div>
@@ -603,19 +775,60 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-display uppercase italic mb-6">The Curriculum</h2>
-            <p className="text-white/40 uppercase tracking-widest text-sm font-bold">From Zero to Viral in 30 Days</p>
+            <p className="text-white/40 uppercase tracking-widest text-sm font-bold mb-8">From Zero to Viral in 30 Days</p>
+            
+            {/* Overall Progress Bar */}
+            <div className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 mb-12">
+              <div className="flex justify-between items-end mb-4">
+                <div className="text-left">
+                  <div className="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Your Progress</div>
+                  <div className="text-3xl font-display italic text-tiktok-cyan">{progressPercentage}% Complete</div>
+                </div>
+                <div className="text-right text-white/40 text-sm font-heading">
+                  {completedModules.length} / {curriculum.length} Modules
+                </div>
+              </div>
+              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  className="h-full bg-tiktok-cyan shadow-[0_0_15px_rgba(37,244,238,0.5)]"
+                />
+              </div>
+            </div>
           </div>
+
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {curriculum.map((item) => (
-              <AccordionItem key={item.id} value={item.id} className="border border-white/10 bg-tiktok-black rounded-2xl px-6">
-                <AccordionTrigger className="text-xl font-display uppercase italic hover:no-underline py-6">
-                  {item.title}
-                </AccordionTrigger>
-                <AccordionContent className="text-white/60 text-lg pb-6 font-heading">
-                  {item.content}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+            {curriculum.map((item) => {
+              const isCompleted = completedModules.includes(item.id);
+              return (
+                <AccordionItem key={item.id} value={item.id} className={`border transition-colors rounded-2xl px-6 ${isCompleted ? 'border-tiktok-cyan/30 bg-tiktok-cyan/5' : 'border-white/10 bg-tiktok-black'}`}>
+                  <AccordionTrigger className="text-xl font-display uppercase italic hover:no-underline py-6 group">
+                    <div className="flex items-center gap-4 text-left">
+                      <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${isCompleted ? 'bg-tiktok-cyan border-tiktok-cyan text-black' : 'border-white/20 text-white/20 group-hover:border-white/40'}`}>
+                        {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <div className="w-2 h-2 bg-current rounded-full" />}
+                      </div>
+                      <span className={isCompleted ? 'text-tiktok-cyan' : 'text-white'}>{item.title}</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-white/60 text-lg pb-6 font-heading">
+                    <div className="space-y-6">
+                      <p>{item.content}</p>
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleModule(item.id);
+                        }}
+                        variant={isCompleted ? "outline" : "default"}
+                        className={`w-full md:w-auto rounded-full font-display italic uppercase py-6 px-8 ${isCompleted ? 'border-tiktok-cyan text-tiktok-cyan hover:bg-tiktok-cyan/10' : 'bg-tiktok-cyan text-black hover:bg-tiktok-cyan/90'}`}
+                      >
+                        {isCompleted ? "Mark as Incomplete" : "Complete Module"}
+                      </Button>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
           </Accordion>
         </div>
       </section>
