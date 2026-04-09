@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user account information and platform status.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user" },
+        "fullName": { "type": "string", "description": "User's full name" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "photoURL": { "type": "string", "format": "uri", "description": "URL to user's profile picture" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the account was created" },
+        "plan": { "type": "string", "enum": ["free", "elite"], "description": "Current subscription plan" },
+        "planActive": { "type": "boolean", "description": "Whether the plan is currently active" },
+        "lastLoginAt": { "type": "string", "format": "date-time", "description": "Last time the user logged in" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User role for access control" }
+      },
+      "required": ["uid", "email", "plan"]
+    },
+    "Simulation": {
+      "title": "Viral Simulation",
+      "description": "Stores AI-generated niche analysis and performance simulations.",
+      "type": "object",
+      "properties": {
+        "niche": { "type": "string", "description": "The base niche entered by the user" },
+        "refinedNiche": { "type": "string", "description": "The AI-refined niche" },
+        "viralPotential": { "type": "string", "description": "Viral potential score (Low/Medium/High)" },
+        "hooks": { "type": "array", "items": { "type": "string" }, "description": "Generated POV hooks" },
+        "powerHook": { "type": "string", "description": "The high-potential power hook" },
+        "nextActions": { "type": "string", "description": "AI-suggested posting strategy" },
+        "projectedViews": { "type": "string", "description": "Projected views range" },
+        "projectedViewsMax": { "type": "string", "description": "Maximum projected views for sorting" },
+        "retention": { "type": "string", "description": "Projected retention range" },
+        "engagement": { "type": "string", "description": "Projected engagement probability" },
+        "monthlyRevenue": { "type": "string", "description": "Projected monthly revenue range" },
+        "monthlyRevenueMax": { "type": "string", "description": "Maximum projected revenue for sorting" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the simulation was run" }
+      },
+      "required": ["niche", "refinedNiche", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/users/{uid}/simulations/{simulationId}": {
+      "schema": "Simulation",
+      "description": "User-specific viral simulations"
+    }
+  }
+}

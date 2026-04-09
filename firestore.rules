@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required)
+    //   - fullName: string (optional)
+    //   - email: string (required, email format)
+    //   - photoURL: string (optional, url format)
+    //   - createdAt: timestamp (required)
+    //   - plan: string (required, enum: ['free', 'elite'])
+    //   - planActive: bool (required)
+    //   - lastLoginAt: timestamp (required)
+    //   - role: string (optional, enum: ['user', 'admin'])
+    //
+    // Collection: users/{uid}/simulations
+    // Document ID: {simulationId}
+    // Fields:
+    //   - niche: string (required)
+    //   - refinedNiche: string (required)
+    //   - viralPotential: string (optional)
+    //   - hooks: list (optional)
+    //   - powerHook: string (optional)
+    //   - nextActions: string (optional)
+    //   - projectedViews: string (optional)
+    //   - projectedViewsMax: string (optional)
+    //   - retention: string (optional)
+    //   - engagement: string (optional)
+    //   - monthlyRevenue: string (optional)
+    //   - monthlyRevenueMax: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == "3ciasanti@gmail.com");
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId && 
+                    request.resource.data.keys().hasAll(['uid', 'email', 'plan']) &&
+                    isValidEmail(request.resource.data.email);
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+      
+      match /simulations/{simulationId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && 
+                      request.resource.data.keys().hasAll(['niche', 'refinedNiche', 'createdAt']) &&
+                      request.resource.data.niche.size() < 200;
+        allow update, delete: if isOwner(userId) || isAdmin();
+      }
+    }
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

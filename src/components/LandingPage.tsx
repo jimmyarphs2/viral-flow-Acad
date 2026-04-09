@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useNavigate, Link } from "react-router-dom";
 import { 
   TrendingUp, 
   Video, 
@@ -23,7 +24,10 @@ import {
   DollarSign,
   Loader2,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  EyeOff,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +47,10 @@ import {
   type HookGeneration,
   type ViralSimulation
 } from "@/services/viralFlowAI";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthModal from "@/components/AuthModal";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const stats = [
   { label: "Active Students", value: "12,400+" },
@@ -171,6 +179,11 @@ const instructors = [
 ];
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -185,7 +198,52 @@ export default function LandingPage() {
   const [hookAI, setHookAI] = useState<HookGeneration | null>(null);
   const [simulationAI, setSimulationAI] = useState<ViralSimulation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedHook, setSelectedHook] = useState("");
+
+  const handleJoinClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      setAuthMode("signup");
+      setIsAuthModalOpen(true);
+    }
+  };
+
+  const handleSaveSimulation = async () => {
+    if (!user) {
+      setAuthMode("signin");
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (!nicheAI || !simulationAI) return;
+
+    setIsSaving(true);
+    try {
+      await addDoc(collection(db, "users", user.uid, "simulations"), {
+        niche: selectedNiche,
+        refinedNiche: nicheAI.refinedNiche,
+        viralPotential: nicheAI.viralPotentialScore,
+        hooks: hookAI?.hooks || [],
+        powerHook: hookAI?.powerHook || null,
+        nextActions: hookAI?.postingStrategy || null,
+        projectedViews: simulationAI.viewsRange,
+        projectedViewsMax: simulationAI.viewsRange.split('-')[1]?.trim() || simulationAI.viewsRange,
+        retention: simulationAI.retentionRange,
+        engagement: simulationAI.engagement,
+        monthlyRevenue: simulationAI.revenueMonthlyRange,
+        monthlyRevenueMax: simulationAI.revenueMonthlyRange.split('–')[1]?.trim() || simulationAI.revenueMonthlyRange,
+        createdAt: serverTimestamp(),
+      });
+      alert("Simulation saved to your dashboard!");
+    } catch (error) {
+      console.error("Error saving simulation:", error);
+      alert("Failed to save simulation. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleNicheSubmit = async (niche: string) => {
     setIsLoading(true);
@@ -275,8 +333,11 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-tiktok-red transition-colors">Strategies</a>
             <a href="#curriculum" className="hover:text-tiktok-cyan transition-colors">Curriculum</a>
             <a href="#testimonials" className="hover:text-tiktok-red transition-colors">Success Stories</a>
-            <Button className="bg-white text-black hover:bg-tiktok-red hover:text-white transition-all rounded-none font-bold px-8">
-              Join Now
+            <Button 
+              onClick={handleJoinClick}
+              className="bg-white text-black hover:bg-tiktok-red hover:text-white transition-all rounded-none font-bold px-8"
+            >
+              {user ? "Dashboard" : "Join Now"}
             </Button>
           </div>
 
@@ -299,8 +360,14 @@ export default function LandingPage() {
               <a href="#features" onClick={() => setIsMenuOpen(false)}>Strategies</a>
               <a href="#curriculum" onClick={() => setIsMenuOpen(false)}>Curriculum</a>
               <a href="#testimonials" onClick={() => setIsMenuOpen(false)}>Success Stories</a>
-              <Button className="w-full bg-tiktok-red text-white py-8 text-xl rounded-none font-display italic">
-                Get Started
+              <Button 
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleJoinClick();
+                }}
+                className="w-full bg-tiktok-red text-white py-8 text-xl rounded-none font-display italic"
+              >
+                {user ? "Go to Dashboard" : "Get Started"}
               </Button>
             </div>
           </motion.div>
@@ -332,8 +399,12 @@ export default function LandingPage() {
                 Master the psychological triggers that force the algorithm to push your content to millions. No dancing required.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Button size="lg" className="bg-tiktok-red text-white hover:bg-white hover:text-black transition-all rounded-none font-display italic text-2xl px-12 py-8 group">
-                  Join the Academy
+                <Button 
+                  size="lg" 
+                  onClick={handleJoinClick}
+                  className="bg-tiktok-red text-white hover:bg-white hover:text-black transition-all rounded-none font-display italic text-2xl px-12 py-8 group"
+                >
+                  {user ? "Access Dashboard" : "Join the Academy"}
                   <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <div className="flex items-center gap-4 text-white/40 font-medium uppercase tracking-widest text-sm">
@@ -584,17 +655,30 @@ export default function LandingPage() {
                       ))}
 
                       {hookAI.powerHook && (
-                        <button
-                          onClick={() => handleSimulation(hookAI.powerHook!)}
-                          disabled={isLoading}
-                          className="w-full p-6 bg-tiktok-red/5 border border-tiktok-red/20 rounded-2xl hover:border-tiktok-red text-left group transition-all relative overflow-hidden"
-                        >
-                          <div className="text-xs uppercase tracking-widest text-tiktok-red font-bold mb-2 flex items-center gap-2">
-                            <Sparkles className="w-3 h-3" /> Power Hook
-                          </div>
-                          <div className="text-xl font-heading italic text-white group-hover:text-tiktok-red">"{hookAI.powerHook}"</div>
-                          <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-red" />
-                        </button>
+                        <div className="relative group/power">
+                          {!user && (
+                            <div className="absolute inset-0 bg-tiktok-black/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-2xl border border-tiktok-red/20">
+                              <Lock className="w-6 h-6 text-tiktok-red mb-2" />
+                              <button 
+                                onClick={handleJoinClick}
+                                className="text-[10px] uppercase tracking-widest font-bold text-tiktok-red hover:underline"
+                              >
+                                Unlock Power Hook
+                              </button>
+                            </div>
+                          )}
+                          <button
+                            onClick={() => handleSimulation(hookAI.powerHook!)}
+                            disabled={isLoading || !user}
+                            className={`w-full p-6 bg-tiktok-red/5 border border-tiktok-red/20 rounded-2xl hover:border-tiktok-red text-left group transition-all relative overflow-hidden ${!user ? 'blur-[2px]' : ''}`}
+                          >
+                            <div className="text-xs uppercase tracking-widest text-tiktok-red font-bold mb-2 flex items-center gap-2">
+                              <Sparkles className="w-3 h-3" /> Power Hook
+                            </div>
+                            <div className="text-xl font-heading italic text-white group-hover:text-tiktok-red">"{hookAI.powerHook}"</div>
+                            <div className="absolute top-0 left-0 w-1 h-full bg-tiktok-red" />
+                          </button>
+                        </div>
                       )}
                     </div>
 
@@ -645,19 +729,38 @@ export default function LandingPage() {
                         <div className="text-2xl font-display italic text-white mb-1">{simulationAI.retentionRange}</div>
                         <div className="text-[10px] uppercase tracking-widest text-white/40">Retention</div>
                       </div>
-                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                        <div className="text-2xl font-display italic text-white mb-1">{simulationAI.engagement}</div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl relative group/blur">
+                        {!user && (
+                          <div className="absolute inset-0 bg-tiktok-black/40 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-2xl">
+                            <Lock className="w-4 h-4 text-tiktok-cyan" />
+                          </div>
+                        )}
+                        <div className={`text-2xl font-display italic text-white mb-1 ${!user ? 'blur-sm select-none' : ''}`}>
+                          {simulationAI.engagement}
+                        </div>
                         <div className="text-[10px] uppercase tracking-widest text-white/40">Engagement</div>
                       </div>
-                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                        <div className="text-2xl font-display italic text-tiktok-cyan mb-1">{simulationAI.revenueMonthlyRange}</div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl relative group/blur">
+                        {!user && (
+                          <div className="absolute inset-0 bg-tiktok-black/40 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-2xl">
+                            <Lock className="w-4 h-4 text-tiktok-cyan" />
+                          </div>
+                        )}
+                        <div className={`text-2xl font-display italic text-tiktok-cyan mb-1 ${!user ? 'blur-sm select-none' : ''}`}>
+                          {simulationAI.revenueMonthlyRange}
+                        </div>
                         <div className="text-[10px] uppercase tracking-widest text-white/40">Monthly Est.</div>
                       </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <Button className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-10 py-8 rounded-full text-xl font-display uppercase italic shadow-[0_0_30px_rgba(254,44,85,0.3)]">
-                        Join & Scale Now
+                      <Button 
+                        onClick={handleSaveSimulation}
+                        disabled={isSaving}
+                        className="bg-tiktok-red hover:bg-tiktok-red/90 text-white px-10 py-8 rounded-full text-xl font-display uppercase italic shadow-[0_0_30px_rgba(254,44,85,0.3)]"
+                      >
+                        {isSaving ? <Loader2 className="w-6 h-6 animate-spin mr-2" /> : <History className="w-6 h-6 mr-2" />}
+                        {user ? "Save to Dashboard" : "Join & Save Result"}
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -771,65 +874,81 @@ export default function LandingPage() {
       </section>
 
       {/* Curriculum Section */}
-      <section id="curriculum" className="py-24 bg-white/5">
-        <div className="container mx-auto px-6 max-w-4xl">
+      <section id="curriculum" className="py-24 bg-white/5 relative overflow-hidden">
+        <div className="container mx-auto px-6 max-w-4xl relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-display uppercase italic mb-6">The Curriculum</h2>
             <p className="text-white/40 uppercase tracking-widest text-sm font-bold mb-8">From Zero to Viral in 30 Days</p>
             
-            {/* Overall Progress Bar */}
-            <div className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 mb-12">
-              <div className="flex justify-between items-end mb-4">
-                <div className="text-left">
-                  <div className="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Your Progress</div>
-                  <div className="text-3xl font-display italic text-tiktok-cyan">{progressPercentage}% Complete</div>
+            {!user ? (
+              <div className="max-w-md mx-auto bg-tiktok-red/5 border border-tiktok-red/20 rounded-2xl p-8 mb-12">
+                <Lock className="w-12 h-12 text-tiktok-red mx-auto mb-4" />
+                <h3 className="text-xl font-display uppercase italic mb-2">Members Only Content</h3>
+                <p className="text-white/40 text-sm font-heading mb-6">Join the academy to unlock the full 30-day viral roadmap and track your progress.</p>
+                <Button 
+                  onClick={handleJoinClick}
+                  className="bg-tiktok-red text-white rounded-full font-display uppercase italic px-8"
+                >
+                  Unlock Access
+                </Button>
+              </div>
+            ) : (
+              /* Overall Progress Bar */
+              <div className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 mb-12">
+                <div className="flex justify-between items-end mb-4">
+                  <div className="text-left">
+                    <div className="text-xs uppercase tracking-widest text-white/40 font-bold mb-1">Your Progress</div>
+                    <div className="text-3xl font-display italic text-tiktok-cyan">{progressPercentage}% Complete</div>
+                  </div>
+                  <div className="text-right text-white/40 text-sm font-heading">
+                    {completedModules.length} / {curriculum.length} Modules
+                  </div>
                 </div>
-                <div className="text-right text-white/40 text-sm font-heading">
-                  {completedModules.length} / {curriculum.length} Modules
+                <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercentage}%` }}
+                    className="h-full bg-tiktok-cyan shadow-[0_0_15px_rgba(37,244,238,0.5)]"
+                  />
                 </div>
               </div>
-              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercentage}%` }}
-                  className="h-full bg-tiktok-cyan shadow-[0_0_15px_rgba(37,244,238,0.5)]"
-                />
-              </div>
-            </div>
+            )}
           </div>
 
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {curriculum.map((item) => {
-              const isCompleted = completedModules.includes(item.id);
-              return (
-                <AccordionItem key={item.id} value={item.id} className={`border transition-colors rounded-2xl px-6 ${isCompleted ? 'border-tiktok-cyan/30 bg-tiktok-cyan/5' : 'border-white/10 bg-tiktok-black'}`}>
-                  <AccordionTrigger className="text-xl font-display uppercase italic hover:no-underline py-6 group">
-                    <div className="flex items-center gap-4 text-left">
-                      <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${isCompleted ? 'bg-tiktok-cyan border-tiktok-cyan text-black' : 'border-white/20 text-white/20 group-hover:border-white/40'}`}>
-                        {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <div className="w-2 h-2 bg-current rounded-full" />}
+          <div className={!user ? "opacity-20 pointer-events-none blur-sm" : ""}>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {curriculum.map((item) => {
+                const isCompleted = completedModules.includes(item.id);
+                return (
+                  <AccordionItem key={item.id} value={item.id} className={`border transition-colors rounded-2xl px-6 ${isCompleted ? 'border-tiktok-cyan/30 bg-tiktok-cyan/5' : 'border-white/10 bg-tiktok-black'}`}>
+                    <AccordionTrigger className="text-xl font-display uppercase italic hover:no-underline py-6 group">
+                      <div className="flex items-center gap-4 text-left">
+                        <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${isCompleted ? 'bg-tiktok-cyan border-tiktok-cyan text-black' : 'border-white/20 text-white/20 group-hover:border-white/40'}`}>
+                          {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <div className="w-2 h-2 bg-current rounded-full" />}
+                        </div>
+                        <span className={isCompleted ? 'text-tiktok-cyan' : 'text-white'}>{item.title}</span>
                       </div>
-                      <span className={isCompleted ? 'text-tiktok-cyan' : 'text-white'}>{item.title}</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-white/60 text-lg pb-6 font-heading">
-                    <div className="space-y-6">
-                      <p>{item.content}</p>
-                      <Button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleModule(item.id);
-                        }}
-                        variant={isCompleted ? "outline" : "default"}
-                        className={`w-full md:w-auto rounded-full font-display italic uppercase py-6 px-8 ${isCompleted ? 'border-tiktok-cyan text-tiktok-cyan hover:bg-tiktok-cyan/10' : 'bg-tiktok-cyan text-black hover:bg-tiktok-cyan/90'}`}
-                      >
-                        {isCompleted ? "Mark as Incomplete" : "Complete Module"}
-                      </Button>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-white/60 text-lg pb-6 font-heading">
+                      <div className="space-y-6">
+                        <p>{item.content}</p>
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleModule(item.id);
+                          }}
+                          variant={isCompleted ? "outline" : "default"}
+                          className={`w-full md:w-auto rounded-full font-display italic uppercase py-6 px-8 ${isCompleted ? 'border-tiktok-cyan text-tiktok-cyan hover:bg-tiktok-cyan/10' : 'bg-tiktok-cyan text-black hover:bg-tiktok-cyan/90'}`}
+                        >
+                          {isCompleted ? "Mark as Incomplete" : "Complete Module"}
+                        </Button>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </div>
         </div>
       </section>
 
@@ -957,8 +1076,12 @@ export default function LandingPage() {
             <p className="text-2xl text-white/60 mb-12 max-w-2xl mx-auto font-heading">
               Join 12,000+ creators who have cracked the code. The next viral video could be yours.
             </p>
-            <Button size="lg" className="bg-white text-black hover:bg-tiktok-cyan transition-all rounded-none font-display italic text-3xl px-16 py-10">
-              Claim Your Spot
+            <Button 
+              size="lg" 
+              onClick={handleJoinClick}
+              className="bg-white text-black hover:bg-tiktok-cyan transition-all rounded-none font-display italic text-3xl px-16 py-10"
+            >
+              {user ? "Access Dashboard" : "Claim Your Spot"}
             </Button>
             <p className="mt-8 text-white/40 text-sm uppercase tracking-widest font-bold">
               Limited spots available for the April cohort
@@ -966,6 +1089,12 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        initialMode={authMode}
+      />
 
       {/* Footer */}
       <footer className="py-12 border-t border-white/10">
