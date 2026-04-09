@@ -135,6 +135,30 @@ const processSteps = [
   },
 ];
 
+const instructors = [
+  {
+    name: "Leo 'Viral' Vance",
+    role: "Algorithm Specialist",
+    bio: "Former platform engineer who decoded the FYP logic. Has helped 500+ creators hit 1M+ views.",
+    expertise: "Algorithm Triggers & Data Analysis",
+    image: "https://picsum.photos/seed/leo/400/500",
+  },
+  {
+    name: "Elena Rossi",
+    role: "Creative Director",
+    bio: "Award-winning short-form editor. Master of the '0.5s Hook' and high-retention storytelling.",
+    expertise: "Visual Psychology & Rapid Editing",
+    image: "https://picsum.photos/seed/elena/400/500",
+  },
+  {
+    name: "David Kross",
+    role: "Monetization Expert",
+    bio: "Built three 7-figure brands using only TikTok traffic. Expert in turning views into high-ticket sales.",
+    expertise: "Brand Strategy & Conversion",
+    image: "https://picsum.photos/seed/david/400/500",
+  },
+];
+
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -593,6 +617,57 @@ export default function LandingPage() {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      {/* Instructors Section */}
+      <section id="instructors" className="py-24 lg:py-32 bg-tiktok-black border-b border-white/10">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-20">
+            <Badge className="bg-tiktok-cyan text-black mb-4 px-4 py-1 rounded-full text-xs uppercase tracking-widest border-none">The Experts</Badge>
+            <h2 className="text-5xl md:text-7xl font-display uppercase italic leading-none mb-8">
+              Learn From the <span className="text-tiktok-red">Best</span>
+            </h2>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto font-heading">
+              Our instructors aren't just teachers—they're active creators who dominate the platforms every single day.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {instructors.map((instructor, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-8 border border-white/10 group-hover:border-tiktok-red/50 transition-colors">
+                  <img 
+                    src={instructor.image} 
+                    alt={instructor.name}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-tiktok-black via-transparent to-transparent opacity-60" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <Badge className="bg-tiktok-red text-white mb-2">{instructor.role}</Badge>
+                    <h3 className="text-3xl font-display uppercase italic text-white">{instructor.name}</h3>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-tiktok-cyan">
+                    <Target className="w-4 h-4" />
+                    <span className="text-xs uppercase tracking-widest font-bold">{instructor.expertise}</span>
+                  </div>
+                  <p className="text-white/60 leading-relaxed font-heading">
+                    {instructor.bio}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
