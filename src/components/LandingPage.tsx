@@ -85,18 +85,24 @@ const testimonials = [
     handle: "@alexcreates",
     text: "I went from 200 views to 1.2M in just 3 weeks. The hook strategies alone are worth 10x the price.",
     avatar: "https://picsum.photos/seed/alex/100/100",
+    followers: "145k",
+    growth: "+850%"
   },
   {
     name: "Sarah Chen",
     handle: "@sarahvlogs",
     text: "ViralFlow changed everything. I finally understand WHY my videos weren't working. Now I hit the FYP daily.",
     avatar: "https://picsum.photos/seed/sarah/100/100",
+    followers: "82k",
+    growth: "+1,200%"
   },
   {
     name: "Marcus Thorne",
     handle: "@marcustalks",
     text: "The community is insane. Having experts review my scripts made all the difference in my growth.",
     avatar: "https://picsum.photos/seed/marcus/100/100",
+    followers: "210k",
+    growth: "+420%"
   },
 ];
 
@@ -131,6 +137,7 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -314,9 +321,16 @@ export default function LandingPage() {
               <div className="grid sm:grid-cols-2 gap-8">
                 {features.map((feature, i) => (
                   <div key={i} className="group">
-                    <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-4 group-hover:bg-tiktok-red/20 transition-colors">
+                    <motion.div 
+                      whileHover={{ 
+                        scale: 1.15, 
+                        rotate: [0, -10, 10, 0],
+                        transition: { duration: 0.4, ease: "easeInOut" }
+                      }}
+                      className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-4 group-hover:bg-tiktok-red/20 transition-colors cursor-pointer"
+                    >
                       {feature.icon}
-                    </div>
+                    </motion.div>
                     <h3 className="text-xl font-display uppercase italic mb-2">{feature.title}</h3>
                     <p className="text-white/40 text-sm leading-relaxed">{feature.description}</p>
                   </div>
@@ -324,34 +338,56 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="relative z-10 bg-card border border-white/10 p-4 rounded-[2rem] shadow-2xl rotate-3">
+              <motion.div 
+                initial={{ rotate: 3 }}
+                whileHover={{ rotate: 0, scale: 1.02 }}
+                className="relative z-10 bg-card border border-white/10 p-4 rounded-[2rem] shadow-2xl cursor-pointer group/video"
+                onClick={() => setIsVideoPlaying(true)}
+              >
                 <div className="aspect-[9/16] bg-tiktok-black rounded-[1.5rem] overflow-hidden relative">
-                  <img 
-                    src="https://picsum.photos/seed/viral/1080/1920" 
-                    className="w-full h-full object-cover opacity-60"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 to-transparent">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full border-2 border-tiktok-cyan overflow-hidden">
-                        <img src="https://picsum.photos/seed/pro/40/40" referrerPolicy="no-referrer" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold">@viral_master</div>
-                        <div className="text-[10px] text-white/60">2.4M Views • 450k Likes</div>
-                      </div>
-                    </div>
-                    <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "100%" }}
-                        transition={{ duration: 5, repeat: Infinity }}
-                        className="h-full bg-tiktok-red"
+                  {!isVideoPlaying ? (
+                    <>
+                      <img 
+                        src="https://picsum.photos/seed/viral/1080/1920" 
+                        className="w-full h-full object-cover opacity-60 group-hover/video:opacity-40 transition-opacity"
+                        referrerPolicy="no-referrer"
                       />
-                    </div>
-                  </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-20 h-20 bg-tiktok-red rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(254,44,85,0.5)] group-hover/video:scale-110 transition-transform">
+                          <Play className="w-10 h-10 text-white fill-current ml-1" />
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 to-transparent">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-full border-2 border-tiktok-cyan overflow-hidden">
+                            <img src="https://picsum.photos/seed/pro/40/40" referrerPolicy="no-referrer" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold">@viral_master</div>
+                            <div className="text-[10px] text-white/60">2.4M Views • 450k Likes</div>
+                          </div>
+                        </div>
+                        <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            whileInView={{ width: "100%" }}
+                            transition={{ duration: 5, repeat: Infinity }}
+                            className="h-full bg-tiktok-red"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <iframe 
+                      src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                      title="ViralFlow Explainer"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowFullScreen
+                    />
+                  )}
                 </div>
-              </div>
+              </motion.div>
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-tiktok-cyan/30 rounded-full blur-3xl" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-tiktok-red/30 rounded-full blur-3xl" />
             </div>
@@ -408,6 +444,24 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <p className="text-white/80 italic leading-relaxed mb-6">"{t.text}"</p>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-6 p-3 bg-white/5 rounded-xl border border-white/5">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">Followers</div>
+                        <div className="flex items-center gap-1.5 font-display italic text-tiktok-cyan">
+                          <Users className="w-3.5 h-3.5" />
+                          {t.followers}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">Growth</div>
+                        <div className="flex items-center gap-1.5 font-display italic text-tiktok-red">
+                          <TrendingUp className="w-3.5 h-3.5" />
+                          {t.growth}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex gap-1">
                       {[1,2,3,4,5].map(star => (
                         <Star key={star} className="w-4 h-4 fill-tiktok-red text-tiktok-red" />
