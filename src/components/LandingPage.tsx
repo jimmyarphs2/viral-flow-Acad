@@ -13,10 +13,12 @@ import {
   Youtube,
   Menu,
   X,
+  Search,
   Star,
   Flame,
   Rocket,
-  Target
+  Target,
+  ChevronUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -98,15 +100,50 @@ const testimonials = [
   },
 ];
 
+const processSteps = [
+  {
+    title: "Identify",
+    description: "Find your winning niche using our data-driven research tools.",
+    icon: <Search className="w-8 h-8 text-tiktok-cyan" />,
+    step: "01"
+  },
+  {
+    title: "Produce",
+    description: "Create high-retention videos with our plug-and-play scripts.",
+    icon: <Video className="w-8 h-8 text-tiktok-red" />,
+    step: "02"
+  },
+  {
+    title: "Hack",
+    description: "Deploy the ViralFlow algorithm triggers to force FYP placement.",
+    icon: <Zap className="w-8 h-8 text-tiktok-cyan" />,
+    step: "03"
+  },
+  {
+    title: "Monetize",
+    description: "Turn your viral views into a sustainable six-figure business.",
+    icon: <Rocket className="w-8 h-8 text-tiktok-red" />,
+    step: "04"
+  },
+];
+
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+      setShowScrollTop(window.scrollY > 400);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-tiktok-black text-white selection:bg-tiktok-red selection:text-white">
@@ -214,6 +251,49 @@ export default function LandingPage() {
               >
                 <div className="text-4xl md:text-5xl font-display italic text-tiktok-cyan mb-2">{stat.value}</div>
                 <div className="text-xs uppercase tracking-[0.2em] text-white/40 font-bold">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The Process Section */}
+      <section className="py-24 border-b border-white/10">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-7xl font-display uppercase italic leading-none mb-6">
+              The <span className="text-tiktok-red">ViralFlow</span> Path
+            </h2>
+            <p className="text-white/40 uppercase tracking-widest text-sm font-bold">Your Journey to Content Mastery</p>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-12">
+            {processSteps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative group"
+              >
+                <div className="absolute -top-6 -left-4 text-8xl font-display italic text-white/5 group-hover:text-tiktok-red/10 transition-colors pointer-events-none">
+                  {step.step}
+                </div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-8 border border-white/10 group-hover:border-tiktok-cyan/50 transition-all group-hover:rotate-3 shadow-xl">
+                    {step.icon}
+                  </div>
+                  <h3 className="text-2xl font-display uppercase italic mb-4 group-hover:text-tiktok-cyan transition-colors">
+                    {step.title}
+                  </h3>
+                  <p className="text-white/40 leading-relaxed font-heading">
+                    {step.description}
+                  </p>
+                </div>
+                {i < processSteps.length - 1 && (
+                  <div className="hidden lg:block absolute top-8 left-full w-full h-[1px] bg-gradient-to-r from-white/10 to-transparent -ml-8 z-0" />
+                )}
               </motion.div>
             ))}
           </div>
@@ -393,6 +473,22 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 w-14 h-14 bg-tiktok-red text-white rounded-full flex items-center justify-center shadow-[4px_4px_0px_#25F4EE] hover:scale-110 active:scale-95 transition-transform"
+            aria-label="Scroll to top"
+          >
+            <ChevronUp className="w-8 h-8" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
