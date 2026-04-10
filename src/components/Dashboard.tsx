@@ -23,7 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { collection, query, where, orderBy, getDocs, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
@@ -35,7 +35,10 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchSimulations = async () => {
-      if (!user) return;
+      if (!user || !isFirebaseEnabled) {
+        setLoadingSims(false);
+        return;
+      }
       try {
         const q = query(
           collection(db, "users", user.uid, "simulations"),

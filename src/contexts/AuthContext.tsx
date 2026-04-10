@@ -3,11 +3,10 @@ import {
   onAuthStateChanged, 
   User, 
   signOut as firebaseSignOut,
-  signInWithPopup,
-  GoogleAuthProvider
+  signInWithPopup
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp, getDocFromServer } from "firebase/firestore";
-import { auth, db, googleProvider } from "@/lib/firebase";
+import { auth, db, googleProvider, isFirebaseEnabled } from "@/lib/firebase";
 
 enum OperationType {
   CREATE = 'create',
@@ -38,15 +37,16 @@ interface FirestoreErrorInfo {
 }
 
 function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  if (!isFirebaseEnabled) return;
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData.map(provider => ({
+      userId: auth?.currentUser?.uid,
+      email: auth?.currentUser?.email,
+      emailVerified: auth?.currentUser?.emailVerified,
+      isAnonymous: auth?.currentUser?.isAnonymous,
+      tenantId: auth?.currentUser?.tenantId,
+      providerInfo: auth?.currentUser?.providerData.map(provider => ({
         providerId: provider.providerId,
         displayName: provider.displayName,
         email: provider.email,
@@ -77,9 +77,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Connection test
   useEffect(() => {
+    if (!isFirebaseEnabled) return;
     async function testConnection() {
       try {
-        // Attempt to fetch a non-existent doc to test connection
         await getDocFromServer(doc(db, 'test', 'connection'));
       } catch (error) {
         if(error instanceof Error && error.message.includes('the client is offline')) {
@@ -91,12 +91,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   useEffect(() => {
+    if (!isFirebaseEnabled) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       try {
         setUser(currentUser);
         
         if (currentUser) {
-          // Update user profile in Firestore
           const userRef = doc(db, "users", currentUser.uid);
           let userDoc;
           try {
@@ -145,6 +149,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signInWithGoogle = async () => {
+    if (!isFirebaseEnabled) {
+      alert("Authentication is currently disabled due to missing configuration.");
+      return;
+    }
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
@@ -154,6 +162,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    if (!isFirebaseEnabled) {
+      setUser(null);
+      return;
+    }
     try {
       await firebaseSignOut(auth);
     } catch (error) {

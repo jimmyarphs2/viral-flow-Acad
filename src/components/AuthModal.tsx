@@ -9,7 +9,7 @@ import {
   sendPasswordResetEmail,
   updateProfile
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, isFirebaseEnabled } from "@/lib/firebase";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -30,6 +30,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = "s
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFirebaseEnabled) {
+      setError("Authentication is currently disabled due to missing configuration.");
+      return;
+    }
     setError(null);
     setMessage(null);
     setLoading(true);

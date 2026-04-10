@@ -1,31 +1,40 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 import firebaseConfig from "../../firebase-applet-config.json";
 
-if (!firebaseConfig || !firebaseConfig.apiKey) {
-  console.error("Firebase configuration is missing or invalid. Please check firebase-applet-config.json.");
-}
+const isConfigValid = firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "TODO_KEYHERE";
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let app;
+let auth: any;
+let db: any;
+let storage: any;
+let googleProvider: any;
+let analytics: any = null;
 
-const databaseId = (firebaseConfig as any).firestoreDatabaseId;
-if (databaseId) {
-  console.log(`Connecting to Firestore database: ${databaseId}`);
+if (isConfigValid) {
+  try {
+    app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    
+    const databaseId = (firebaseConfig as any).firestoreDatabaseId;
+    db = databaseId ? getFirestore(app, databaseId) : getFirestore(app);
+    storage = getStorage(app);
+    googleProvider = new GoogleAuthProvider();
+    
+    if (typeof window !== "undefined") {
+      analytics = getAnalytics(app);
+    }
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
+    app = null;
+  }
 } else {
-  console.log("Connecting to default Firestore database");
+  console.warn("Firebase configuration is missing or invalid. Firebase features will be disabled.");
 }
 
-export const db = databaseId 
-  ? getFirestore(app, databaseId)
-  : getFirestore(app);
-export const storage = getStorage(app);
-export const googleProvider = new GoogleAuthProvider();
-
-// Analytics is only available in browser environments
-export const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
-
+export { auth, db, storage, googleProvider, analytics };
+export const isFirebaseEnabled = !!app;
 export default app;

@@ -49,7 +49,7 @@ import {
 } from "@/services/viralFlowAI";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthModal from "@/components/AuthModal";
-import { db } from "@/lib/firebase";
+import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const stats = [
@@ -211,6 +211,11 @@ export default function LandingPage() {
   };
 
   const handleSaveSimulation = async () => {
+    if (!isFirebaseEnabled) {
+      alert("Saving simulations is currently disabled due to missing configuration.");
+      return;
+    }
+
     if (!user) {
       setAuthMode("signin");
       setIsAuthModalOpen(true);
